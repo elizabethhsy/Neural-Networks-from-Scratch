@@ -7,8 +7,10 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 int main(int, char**) {
-    VectorXd inputs(4);
-    inputs << 1, 2, 3, 2.5;
+    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+
+    MatrixXd inputs(3, 4);
+    inputs << 1, 2, 3, 2.5, 2, 5, -1, 2, -1.5, 2.7, 3.3, -0.8;
 
     MatrixXd weights(3, 4);
     weights << 0.2, 0.8, -0.5, 1, 0.5, -0.91, 0.26, -0.5, -0.26, -0.27, 0.17, 0.87;
@@ -16,55 +18,22 @@ int main(int, char**) {
     VectorXd biases(3);
     biases << 2, 3, 0.5;
 
-    VectorXd outputs(3);
-    outputs << weights*inputs.matrix() + biases;
+    MatrixXd weights2(3, 3);
+    weights2 << 0.1, -0.14, 0.5, -0.5, 0.12, -0.33, -0.44, 0.73, -0.13;
 
-    std::cout << outputs.transpose() << "\n";
+    VectorXd biases2(3);
+    biases2 << -1, 2, -0.5;
 
-    // std::vector <float> inputs = {1, 2, 3, 2.5};
+    MatrixXd layer1_outputs(3, 3);
+    layer1_outputs << inputs*weights.transpose();
+    layer1_outputs.rowwise() += biases.transpose();
 
-    // std::vector <std::vector<float> > weights = {
-    //     {0.2, 0.8, -0.5, 1},
-    //     {0.5, -0.91, 0.26, -0.5},
-    //     {-0.26, -0.27, 0.17, 0.87}
-    // };
+    MatrixXd layer2_outputs(3, 3);
+    layer2_outputs << layer1_outputs*weights2.transpose();
+    layer2_outputs.rowwise() += biases2.transpose();
 
-    // std::cout << outputs.transpose() << '\n';
-
-    // std::vector <float> biases = {2, 3, 0.5};
-
-    // // std::vector <float> output = {
-    // //     std::inner_product(std::begin(inputs), std::end(inputs), std::begin(weights[0]), biases[0]),
-    // //     std::inner_product(std::begin(inputs), std::end(inputs), std::begin(weights[1]), biases[1]),
-    // //     std::inner_product(std::begin(inputs), std::end(inputs), std::begin(weights[2]), biases[2])
-    // // };
-
-    // std::vector <float> output = {
-    //     std::inner_product(std::begin(weights), std::end(weights), std::begin(inputs), biases)
-    // };
-
-    // std::vector <float> layer_outputs;
-    // float neuron_output;
-
-    // for (int i=0;i<weights.size(); i++) {
-    //     auto neuron_weights = weights[i];
-    //     auto neuron_bias = biases[i];
-    //     neuron_output = 0;
-
-    //     for (int j=0; j<neuron_weights.size();j++) {
-    //         auto neuron_weight = neuron_weights[j];
-    //         auto neuron_input = inputs[j];
-    //         neuron_output += neuron_weight*neuron_input;
-    //     }
-    //     neuron_output += neuron_bias;
-    //     layer_outputs.push_back(neuron_output);
-    // }
-
-    // printf("Output: ");
-    // for (float i:layer_outputs) {
-    //     printf("%.6g ", i);
-    // }
-    // printf("\n");
+    std::cout << layer1_outputs.format(CleanFmt) << "\n";
+    std::cout << layer2_outputs.format(CleanFmt) << "\n";
 
     return 0;
 }
