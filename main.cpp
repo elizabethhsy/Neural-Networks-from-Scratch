@@ -1,6 +1,8 @@
 #include <Eigen/Dense>
+#include <functional>
 #include <iostream>
 #include <numeric>
+#include <tuple>
 #include <vector>
 
 using Eigen::MatrixXd;
@@ -23,6 +25,15 @@ struct Layer_Dense {
     }
 };
 
+struct Activation_ReLU {
+    MatrixXd outputs;
+    void forward(MatrixXd inputs) {
+        outputs = inputs.unaryExpr([](double i) {
+            return std::max(0.0, i);
+        });
+    }
+};
+
 int main(int, char**) {
     Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
@@ -31,12 +42,15 @@ int main(int, char**) {
     X << 1, 2, 3, 2.5, 2, 5, -1, 2, -1.5, 2.7, 3.3, -0.8;
 
     Layer_Dense layer1(4, 5);
+    Activation_ReLU activation1;
     Layer_Dense layer2(5, 2);
 
     layer1.forward(X);
-    layer2.forward(layer1.outputs);
+    activation1.forward(layer1.outputs);
+    layer2.forward(activation1.outputs);
 
     std::cout << layer1.outputs.format(CleanFmt) << "\n";
+    std::cout << activation1.outputs.format(CleanFmt) << "\n";
     std::cout << layer2.outputs.format(CleanFmt) << "\n";
     return 0;
 }
